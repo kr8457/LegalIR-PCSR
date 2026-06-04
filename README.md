@@ -124,24 +124,7 @@ LegalIR_05 → rag_results.json
 
 ---
 
-## 📁 Repository Structure
 
-```
-LegalIR-PCSR/
-│
-├── 📓 LegalIR_01_Data.ipynb        ← Load IL-PCSR dataset
-├── 📓 LegalIR_02_BM25.ipynb        ← BM25 baseline
-├── 📓 LegalIR_03_SBERT.ipynb       ← SBERT embeddings
-├── 📓 LegalIR_04_Ensemble.ipynb    ← Ensemble + grid search
-├── 📓 LegalIR_05_RAG.ipynb         ← RAG pipeline
-├── 📓 LegalIR_06_Results.ipynb     ← Results table
-│
-├── 📄 requirements.txt             ← Python dependencies
-├── 📄 README.md                    ← This file
-└── 📄 LICENSE                      ← MIT License
-```
-
----
 
 ## 🔧 Pipeline Architecture
 
