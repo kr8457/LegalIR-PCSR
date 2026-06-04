@@ -26,8 +26,6 @@ The system allows citizens to describe their legal situation in plain natural la
 
 
 
----
-
 ## 📊 Results
 
 ### Our Results vs IL-PCSR Paper (Paul et al., EMNLP 2025)
@@ -147,43 +145,39 @@ LegalIR-PCSR/
 
 ## 🔧 Pipeline Architecture
 
+### Evaluation Pipeline
+```
+User Query
+    │
+    ├──→ BM25 (2,3,4,5 n-grams)
+    │         └──→ Rank 936 statutes  → F1@k / MAP / MRR  [LSR]
+    │         └──→ Rank 3183 prec.    → F1@k / MAP / MRR  [PCR]
+    │
+    ├──→ SBERT (all-MiniLM-L6-v2)
+    │         └──→ Cosine similarity  → F1@k / MAP / MRR  [LSR + PCR]
+    │
+    └──→ Ensemble (alpha grid search 0.0 → 1.0)
+              └──→ Z-Norm(BM25) + Z-Norm(SBERT)
+                        └──→ Best alpha: LSR=0.0 / PCR=0.5
+                                  └──→ F1@k / MAP / MRR  [LSR + PCR]
+```
+
+### RAG Pipeline (Original Contribution)
 ```
 User Query (plain English)
-          │
-          ▼
-┌─────────────────────┐
-│   BM25 Retrieval    │
-│   3-gram (statutes) │
-│   5-gram (prec.)    │
-└──────────┬──────────┘
-           │ Top-50 candidates
-           ▼
-┌─────────────────────┐
-│   SBERT Re-ranking  │
-│  all-MiniLM-L6-v2   │
-│  cosine similarity  │
-└──────────┬──────────┘
-           │ Top-10 results
-           ▼
-┌─────────────────────┐
-│  Ensemble Scoring   │
-│  α×SBERT +          │
-│  (1-α)×BM25         │
-└──────────┬──────────┘
-           │ Top-3 statutes
-           │ Top-3 precedents
-           ▼
-┌─────────────────────┐
-│    RAG Pipeline     │
-│  Groq LLaMA-3.3-70b │
-│  Plain English      │
-│  Explanation        │
-└──────────┬──────────┘
-           │
-           ▼
-  Legal Explanation
-  + Practical Steps
-  + Disclaimer ⚠️
+    │
+    ├──→ BM25 3-gram → top-3 statutes  ──┐
+    │                                     │
+    └──→ BM25 5-gram → top-3 precedents ─┤
+                                          │
+                                          ▼
+                               Groq LLaMA-3.3-70b-versatile
+                               (6 documents as context)
+                                          │
+                                          ▼
+                               Plain English Explanation
+                               + Practical Steps
+                               + Legal Disclaimer ⚠️
 ```
 
 ---
@@ -195,9 +189,9 @@ The IL-PCSR paper (Paul et al., EMNLP 2025) implemented BM25, GNN-based semantic
 Our original contribution:
 
 > We implement a **citizen-facing RAG pipeline** that:
-> 1. Retrieves relevant statutes using BM25 3-gram
-> 2. Retrieves relevant precedents using BM25 5-gram
-> 3. Passes top-3 of each to Groq LLaMA-3.3-70b
+> 1. Retrieves top-3 relevant statutes using BM25 3-gram
+> 2. Retrieves top-3 relevant precedents using BM25 5-gram
+> 3. Passes all 6 documents as context to Groq LLaMA-3.3-70b
 > 4. Generates plain English legal explanations
 > 5. Includes actionable steps and legal disclaimer
 >
@@ -215,12 +209,12 @@ Input: "My employer has not paid my salary for 3 months.
 Output: "The laws that apply to your situation are related
          to employment and payment of salaries. Statute 3
          (ID: 938899) defines what constitutes a salary...
-         
+
          Practical steps:
          1. Send a formal letter demanding payment
          2. Keep records of all communication
          3. File complaint with labour department
-         
+
          ⚠️ DISCLAIMER: Not legal advice.
             Consult a qualified lawyer."
 ```
@@ -233,12 +227,29 @@ Input: "My landlord cut my electricity without notice.
 Output: "The landlord's action is likely a violation of
          your rights as a tenant. Landlords are required
          to provide safe and habitable living conditions...
-         
+
          Practical steps:
          1. Document the incident with dates and times
          2. Review your lease agreement
          3. Contact local housing authority
-         
+
+         ⚠️ DISCLAIMER: Not legal advice."
+```
+
+### Query 3 — Consumer Fraud
+```
+Input: "I bought a mobile phone online and received a
+        fake item. Seller is refusing to refund.
+        What can I do legally?"
+
+Output: "Statute 2 (ID: 1454268) and Statute 3
+         (ID: 1538044) apply to your situation...
+
+         Practical steps:
+         1. Contact the seller again formally
+         2. File complaint with consumer protection agency
+         3. Consider small claims court
+
          ⚠️ DISCLAIMER: Not legal advice."
 ```
 
@@ -247,11 +258,12 @@ Output: "The landlord's action is likely a violation of
 ## 🔮 Future Work
 
 - [ ] Apply pipeline to Pakistani legal corpus (PPC + Supreme Court of Pakistan)
-- [ ] Create first Pakistani Legal IR benchmark — PakLegal-IR
+- [ ] Create  Pakistani Legal IR benchmark — PakLegal-IR
 - [ ] Bilingual retrieval supporting English + Urdu queries
 - [ ] Fine-tune SBERT on IL-PCSR training set
 - [ ] Implement Para-GNN for improved semantic retrieval
-- [ ] Streamlit web interface for citizen access
+- [ ] Add ensemble-based retrieval to RAG pipeline
+
 
 ---
 
@@ -290,10 +302,11 @@ All outputs generated by the RAG pipeline are informational and do **not** const
 
 ## 📜 License
 
-MIT License — Copyright (c) 2026 
+MIT License — Copyright (c) 2026 Khalid Rafique, Ismail Hamza, Muhammad Mutahir — Air University Islamabad
 
 See LICENSE file for full details.
 
----
+
+
 
 
