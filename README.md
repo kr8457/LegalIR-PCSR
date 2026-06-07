@@ -108,26 +108,11 @@ GROQ_API_KEY  → Groq API key
 | LegalIR_03_SBERT.ipynb | SBERT embeddings | GPU | ~15 min |
 | LegalIR_04_Ensemble.ipynb | Ensemble + grid search | GPU | ~1 hr |
 | LegalIR_05_RAG.ipynb | RAG pipeline | CPU | ~20 min |
-| LegalIR_06_Results.ipynb | Results table | CPU | ~2 min |
+
 
 Note: Switch to GPU runtime (T4) for Notebooks 3 and 4
 
-### 5. Saved Files Between Notebooks
 
-```
-LegalIR_01 → processed_data.pkl
-LegalIR_02 → bm25_results.pkl
-LegalIR_03 → statute_embeddings.pt
-             precedent_embeddings.pt
-             query_embeddings.pt
-LegalIR_04 → all_results.pkl
-LegalIR_05 → rag_results.json
-             rag_results.pkl
-```
-
-Download each pkl/pt file to laptop after each notebook. Upload to next notebook.
-
----
 
 ## Pipeline Architecture
 
